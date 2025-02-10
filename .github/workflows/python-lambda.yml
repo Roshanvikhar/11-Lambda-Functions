@@ -38,10 +38,7 @@ jobs:
         run: |
           pip install safety bandit
           safety check -r requirements.txt
-          bandit -r .
-
-      - name: Run command with non-failing exit
-        run: some_command || true
+          bandit -r . -c .bandit
 
       - name: Package Artifact
         run: |
