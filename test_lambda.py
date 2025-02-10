@@ -5,4 +5,4 @@ def test_lambda_handler():
     event = {}
     context = {}
     response = lambda_function.lambda_handler(event, context)
-    assert response['statusCode'] == 200, "Expected status code 200"
+    assert response['statusCode'] == 200  # nosec

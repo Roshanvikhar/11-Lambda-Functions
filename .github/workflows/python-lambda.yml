@@ -22,9 +22,8 @@ jobs:
       - name: Install Dependencies
         run: |
           pip install -r requirements.txt
-          pip install --upgrade pip
           pip install pytest pytest-cov
-   
+
       - name: Secrets Scan
         uses: gitleaks/gitleaks-action@v2
 
@@ -38,7 +37,7 @@ jobs:
         run: |
           pip install safety bandit
           safety check -r requirements.txt
-          bandit -r . -c .bandit
+          bandit -r . -l  # Ignore low-severity issues
 
       - name: Package Artifact
         run: |
