@@ -64,7 +64,7 @@ jobs:
         run: |
           aws lambda create-function \
             --function-name my-python-lambda \
-            --runtime python3.x \
+            --runtime python3.9 \
             --role arn:aws:iam::703671897239:role/OIDC-GitHub \
             --handler lambda_function.lambda_handler \
             --code S3Bucket=${{ secrets.S3_BUCKET }},S3Key=lambda-package.zip \
