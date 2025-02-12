@@ -2,11 +2,9 @@ name: Python Lambda CI/CD
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
   build-deploy:
@@ -22,26 +20,7 @@ jobs:
       - name: Install Dependencies
         run: |
           pip install -r requirements.txt
-          pip install pytest pytest-cov
-
-      # - name: Secrets Scan
-      #   uses: gitleaks/gitleaks-action@v2
-
-      # - name: Run Unit Tests
-      #   run: pytest --cov=./ --cov-report=xml
-
-      # - name: Code Coverage
-      #   uses: codecov/codecov-action@v3
-
-      # - name: Security Scan
-      #   run: |
-      #     pip install safety bandit
-      #     safety check -r requirements.txt
-      #     bandit -r . -l  # Ignore low-severity issues
-
-      # - name: Package Artifact
-      #   run: |
-      #     zip -r lambda-package.zip .
+          pip install pytest pytest-cov boto3
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -64,7 +43,7 @@ jobs:
             --role arn:aws:iam::703671897239:role/OIDC-GitHub \
             --handler lambda_function.lambda_handler \
             --code S3Bucket=${{ secrets.S3_BUCKET }},S3Key=lambda-package.zip \
-            --environment "Variables={INSTANCE_IDS=${{ secrets.INSTANCE_IDS }}" \
+            --environment "Variables={INSTANCE_IDS=\"${{ secrets.INSTANCE_IDS }}\"}" \
             --region ${{ secrets.AWS_REGION }}
 
       - name: Update Existing Lambda
