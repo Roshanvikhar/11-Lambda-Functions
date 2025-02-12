@@ -2,9 +2,11 @@ name: Python Lambda CI/CD
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   build-deploy:
@@ -20,37 +22,33 @@ jobs:
       - name: Install Dependencies
         run: |
           pip install -r requirements.txt
-          pip install pytest pytest-cov boto3
+          pip install pytest pytest-cov
 
-      # - name: Secrets Scan
-      #   uses: gitleaks/gitleaks-action@v2
+      - name: Secrets Scan
+        uses: gitleaks/gitleaks-action@v2
 
-      # - name: Run Unit Tests
-      #   run: pytest --cov=./ --cov-report=xml
+      - name: Run Unit Tests
+        run: pytest --cov=./ --cov-report=xml
 
-      # - name: Code Coverage
-      #   uses: codecov/codecov-action@v3
+      - name: Code Coverage
+        uses: codecov/codecov-action@v3
 
-      # - name: Security Scan
-      #   run: |
-      #     pip install safety bandit
-      #     safety check -r requirements.txt
-      #     bandit -r . -l
+      - name: Security Scan
+        run: |
+          pip install safety bandit
+          safety check -r requirements.txt
+          bandit -r . -l  # Ignore low-severity issues
 
-      # - name: Package Artifact
-      #   run: zip -r lambda-package.zip .
+      - name: Package Artifact
+        run: |
+          zip -r lambda-package.zip .
 
-      # - name: Configure Node.js
-      #   uses: actions/setup-node@v3
-      #   with:
-      #     node-version: 18
-
-      - name: Configure AWS Credentials (OIDC)
+      - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
-          role-to-assume: arn:aws:iam::703671897239:role/OIDC-GitHub
-          role-session-name: GitHubActions-Lambda-Deploy
 
       - name: Check Lambda Exists
         id: check_lambda
