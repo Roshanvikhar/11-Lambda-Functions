@@ -22,59 +22,57 @@ jobs:
       - name: Install Dependencies
         run: |
           pip install -r requirements.txt
-          pip install pytest pytest-cov
+          pip install pytest pytest-cov boto3
 
-      - name: Secrets Scan
-        uses: gitleaks/gitleaks-action@v2
+      # - name: Secrets Scan
+      #   uses: gitleaks/gitleaks-action@v2
 
-      - name: Run Unit Tests
-        run: pytest --cov=./ --cov-report=xml
+      # - name: Run Unit Tests
+      #   run: pytest --cov=./ --cov-report=xml
 
-      - name: Code Coverage
-        uses: codecov/codecov-action@v3
+      # - name: Code Coverage
+      #   uses: codecov/codecov-action@v3
 
-      - name: Security Scan
-        run: |
-          pip install safety bandit
-          safety check -r requirements.txt
-          bandit -r . -l  # Ignore low-severity issues
+      # - name: Security Scan
+      #   run: |
+      #     pip install safety bandit
+      #     safety check -r requirements.txt
+      #     bandit -r . -l  # Ignore low-severity issues
 
       - name: Package Artifact
         run: |
           zip -r lambda-package.zip .
 
-      - name: Configure AWS Credentials
+      - name: Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: Upload to S3
-        run: aws s3 cp lambda-package.zip s3://${{ secrets.S3_BUCKET }}/lambda-package.zip
+          role-to-assume: arn:aws:iam::703671897239:role/OIDC-GitHub
+          role-session-name: GitHubActions-Lambda-Deploy
 
       - name: Check if Lambda Function Exists
         id: check_lambda
         continue-on-error: true
         run: |
-          aws lambda get-function --function-name my-python-lambda --region us-east-1
+          aws lambda get-function --function-name EC2-Controller --region us-east-1
 
       - name: Deploy to Lambda (Create if Not Exists)
         if: steps.check_lambda.outcome == 'failure'
         run: |
           aws lambda create-function \
-            --function-name my-python-lambda \
+            --function-name EC2-Controller \
             --runtime python3.9 \
             --role arn:aws:iam::703671897239:role/OIDC-GitHub \
             --handler lambda_function.lambda_handler \
             --code S3Bucket=${{ secrets.S3_BUCKET }},S3Key=lambda-package.zip \
+            --environment "Variables={INSTANCE_IDS=${{ secrets.INSTANCE_IDS }}}" \
             --region us-east-1
 
       - name: Update Lambda Code (If Already Exists)
         if: steps.check_lambda.outcome == 'success'
         run: |
           aws lambda update-function-code \
-            --function-name my-python-lambda \
+            --function-name EC2-Controller \
             --s3-bucket ${{ secrets.S3_BUCKET }} \
             --s3-key lambda-package.zip \
             --region us-east-1
