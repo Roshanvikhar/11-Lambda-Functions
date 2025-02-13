@@ -16,9 +16,12 @@ jobs:
       - name:
         uses: actions/checkout@v3
 
-      - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v3
         with:
+          role-to-assume: arn:aws:iam::703671897239:role/OIDC-GitHub
+          role-session-name: OIDC-GitHub
+          aws-region: us-east-1
           python-version: '3.9'
 
       - name: Install dependencies
@@ -26,13 +29,6 @@ jobs:
 
       - name: Package Lambda code
         run: zip -r lambda-package.zip lambda_function.py
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v3
-        with:
-          role-to-assume: arn:aws:iam::703671897239:role/OIDC-GitHub
-          role-session-name: OIDC-GitHub
-          aws-region: us-east-1
 
       - name: Deploy to Lambda
         run: |
