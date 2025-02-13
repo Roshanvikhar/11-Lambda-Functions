@@ -21,4 +21,4 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::703671897239:role/OIDC-GitHub
           role-session-name: OIDC-GitHub
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: us-east-1
