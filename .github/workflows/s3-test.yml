@@ -1,0 +1,37 @@
+name: Create S3 Bucket and Upload File
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  create-and-upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: arn:aws:iam::615299761831:oidc-provider/token.actions.githubusercontent.com
+          aws-region: us-east-1
+
+      - name: Create a test file
+        run: |
+          echo "This is a test file uploaded by GitHub Actions." > test-file.txt
+
+      - name: Create S3 Bucket
+        run: |
+          BUCKET_NAME=github-actions-test-$(date +%s)
+          echo "Bucket name: $BUCKET_NAME"
+          echo "BUCKET_NAME=$BUCKET_NAME" >> $GITHUB_ENV
+          aws s3api create-bucket --bucket $BUCKET_NAME --region us-east-1 --create-bucket-configuration LocationConstraint=us-east-1
+
+      - name: Upload file to S3
+        run: |
+          aws s3 cp test-file.txt s3://$BUCKET_NAME/
