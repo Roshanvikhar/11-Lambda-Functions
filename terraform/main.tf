@@ -2,7 +2,7 @@ provider "aws" {
   region = "us-east-1"
 }
 
-resource "aws_s3_bucket" "github_bucket" {
+data "aws_s3_bucket" "github_bucket" {
   bucket = "github-actions-terraform-test"
 }
 
