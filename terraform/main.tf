@@ -5,6 +5,9 @@ provider "aws" {
 resource "aws_s3_bucket" "github_bucket" {
   bucket = "github-actions-terraform-test"
 }
+resource "aws_s3_bucket" "github_bucket" {
+  bucket = "github-actions-terraform-test-tfstate"
+}
 
 resource "aws_s3_bucket_object" "uploaded_file" {
   bucket = aws_s3_bucket.github_bucket.id
