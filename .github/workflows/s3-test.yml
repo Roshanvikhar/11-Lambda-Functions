@@ -28,17 +28,25 @@ jobs:
         with:
           terraform_version: 1.6.4
 
+      # Create the test file in the root directory
       - name: Create test file
         run: echo "This is a test file uploaded via Terraform!" > test-file.txt
 
+      # Move the test file into the terraform directory
+      - name: Move test file to terraform directory
+        run: mv test-file.txt terraform/
+
+      # Terraform Init
       - name: Terraform Init
         run: terraform init
         working-directory: terraform
 
+      # Terraform Apply
       - name: Terraform Apply
         run: terraform apply -auto-approve
         working-directory: terraform
 
+      # Terraform Output
       - name: Terraform Output
         run: terraform output bucket_name
         working-directory: terraform
