@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-    
 
 permissions:
   id-token: write
@@ -26,18 +25,30 @@ jobs:
 
       - name: Create a test file
         run: |
-          echo "This is a tests file uploaded by GitHub Actions." > test-file.txt
+          echo "This is a test file uploaded by GitHub Actions." > test-file.txt
 
       - name: Create S3 Bucket
         run: |
           BUCKET_NAME=github-actions-test-$(date +%s)
           echo "Bucket name: $BUCKET_NAME"
           echo "BUCKET_NAME=$BUCKET_NAME" >> $GITHUB_ENV
-          aws s3api create-bucket --bucket $BUCKET_NAME --region us-east-1 --create-bucket-configuration LocationConstraint=us-east-1
+          
+          if [ "$AWS_REGION" = "us-east-1" ]; then
+            aws s3api create-bucket --bucket "$BUCKET_NAME"
+          else
+            aws s3api create-bucket --bucket "$BUCKET_NAME" --create-bucket-configuration LocationConstraint=$AWS_REGION
+          fi
+        env:
+          AWS_REGION: us-east-1
 
       - name: Upload file to S3
         run: |
           aws s3 cp test-file.txt s3://$BUCKET_NAME/
 
-            - name: Print GitHub OIDC Token (for debug only)
-        id: debug-token   
+      - name: Print GitHub OIDC Token (for debug only)
+        id: debug-token
+        run: |
+          echo "Requesting OIDC Token..."
+          TOKEN=$(curl -s -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sts.amazonaws.com")
+          echo "OIDC Token:"
+          echo $TOKEN | jq .
