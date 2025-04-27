@@ -26,7 +26,7 @@ jobs:
 
       - name: Create a test file
         run: |
-          echo "This is a test file uploaded by GitHub Actions." > test-file.txt
+          echo "This is a tests file uploaded by GitHub Actions." > test-file.txt
 
       - name: Create S3 Bucket
         run: |
