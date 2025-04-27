@@ -41,6 +41,8 @@ jobs:
 
             - name: Print GitHub OIDC Token (for debug only)
         id: debug-token
+
+      - name: testing OIDC  
         run: |
           echo "Requesting OIDC Token..."
           TOKEN=$(curl -s -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sts.amazonaws.com")
