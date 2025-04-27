@@ -21,7 +21,7 @@ jobs:
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v3
         with:
-          role-to-assume: arn:aws:iam::615299761831:role/gtihub-aztion-terrafrom-test-role
+          role-to-assume: arn:aws:iam::615299761831:role/testing-testing
           aws-region: us-east-1
 
       - name: Create a test file
