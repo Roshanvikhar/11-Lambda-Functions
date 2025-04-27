@@ -38,3 +38,11 @@ jobs:
       - name: Upload file to S3
         run: |
           aws s3 cp test-file.txt s3://$BUCKET_NAME/
+
+            - name: Print GitHub OIDC Token (for debug only)
+        id: debug-token
+        run: |
+          echo "Requesting OIDC Token..."
+          TOKEN=$(curl -s -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sts.amazonaws.com")
+          echo "OIDC Token:"
+          echo $TOKEN | jq .    
