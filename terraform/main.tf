@@ -4,7 +4,7 @@ provider "aws" {
 
 # ✅ Create bucket (because it does not exist)
 resource "aws_s3_bucket" "github_bucket" {
-  bucket = "the-bucket"
+  bucket = "the-bucket-testing-009099"
 }
 
 # ✅ Upload test file into the created bucket
