@@ -1,52 +1,56 @@
 name: Deploy S3 Bucket and Upload File with Terraform
-
 on:
   push:
     branches:
       - main
-
 permissions:
   id-token: write
   contents: read
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Configure AWS credentials (OIDC)
-        uses: aws-actions/configure-aws-credentials@v3
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::615299761831:role/github-action.oidc
           aws-region: us-east-1
 
+      - name: Debug AWS credentials
+        run: aws sts get-caller-identity
+
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.6.4
+          terraform_version: 1.9.0
 
-      # Create the test file in the root directory
       - name: Create test file
         run: echo "This is a test file uploaded via Terraform!!!!!!" > test-file.txt
 
-      # Move the test file into the terraform directory
       - name: Move test file to terraform directory
         run: mv test-file.txt terraform/
 
-      # Terraform Init
+      - name: Debug directory contents
+        run: ls -la terraform/
+        working-directory: .
+
+      - name: Terraform Validate
+        run: terraform validate
+        working-directory: terraform
+
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -no-color
         working-directory: terraform
+        env:
+          TF_LOG: DEBUG
 
-      # Terraform Apply
       - name: Terraform Apply
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve -no-color
         working-directory: terraform
 
-      # Terraform Output
       - name: Terraform Output
         run: terraform output bucket_name
         working-directory: terraform
