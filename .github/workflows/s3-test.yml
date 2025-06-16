@@ -30,7 +30,7 @@ jobs:
 
       # Create the test file in the root directory
       - name: Create test file
-        run: echo "This is a test file uploaded via Terraform!!!!!!!" > test-file.txt
+        run: echo "This is a test file uploaded via Terraform!!!!!!" > test-file.txt
 
       # Move the test file into the terraform directory
       - name: Move test file to terraform directory
