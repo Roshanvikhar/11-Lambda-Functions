@@ -37,15 +37,15 @@ jobs:
         run: ls -la terraform/
         working-directory: .
 
-      - name: Terraform Validate
-        run: terraform validate
-        working-directory: terraform
-
       - name: Terraform Init
         run: terraform init -no-color
         working-directory: terraform
         env:
           TF_LOG: DEBUG
+
+      - name: Terraform Validate
+        run: terraform validate
+        working-directory: terraform
 
       - name: Terraform Apply
         run: terraform apply -auto-approve -no-color
